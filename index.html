@@ -2,36 +2,116 @@
 <html>
 <head>
   <title>Chat2Calendar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 350px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #5a67d8;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: green;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>Chat2Calendar</h2>
+<div class="container">
+  <h2>🚀 Chat2Calendar</h2>
 
-<input type="text" id="msg" placeholder="Enter your task" />
-<button onclick="send()">Create Event</button>
+  <input type="text" id="msg" placeholder="e.g. Meeting tomorrow at 5pm" />
+  <button onclick="send()">Create Event</button>
+
+  <div id="status" class="status"></div>
+</div>
 
 <script>
-function send() {
+async function send() {
   const message = document.getElementById("msg").value;
+  const status = document.getElementById("status");
 
-  fetch("https://geethal.app.n8n.cloud/webhook/whatsapp", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      body: {
-        Body: message
-      }
-    })
-  })
-  .then(res => res.text())
-  .then(() => {
-    alert("✅ Event Created!");
-  })
-  .catch(err => {
-    alert("❌ Error: " + err);
-  });
+  if (!message) {
+    status.style.color = "red";
+    status.innerText = "⚠️ Please enter a message";
+    return;
+  }
+
+  status.style.color = "black";
+  status.innerText = "⏳ Creating event...";
+
+  try {
+    const response = await fetch("https://geethal.app.n8n.cloud/webhook/whatsapp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        body: {
+          Body: message
+        }
+      })
+    });
+
+    if (response.ok) {
+      status.style.color = "green";
+      status.innerText = "✅ Event created successfully!";
+    } else {
+      status.style.color = "red";
+      status.innerText = "❌ Failed to create event";
+    }
+
+  } catch (error) {
+    status.style.color = "red";
+    status.innerText = "❌ Error: " + error.message;
+  }
 }
 </script>
 
