@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat2Calendar</title>
+</head>
+<body>
+
+<h2>Chat2Calendar</h2>
+
+<input type="text" id="msg" placeholder="Enter your task" />
+<button onclick="send()">Create Event</button>
+
+<script>
+function send() {
+  const message = document.getElementById("msg").value;
+
+  fetch("https://geethal.app.n8n.cloud/webhook/whatsapp", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      body: {
+        Body: message
+      }
+    })
+  })
+  .then(res => res.text())
+  .then(() => {
+    alert("✅ Event Created!");
+  })
+  .catch(err => {
+    alert("❌ Error: " + err);
+  });
+}
+</script>
+
+</body>
+</html>
